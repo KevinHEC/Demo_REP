@@ -1,1 +1,19 @@
-
+ltab,
+    v.gueltbis
+FROM
+    vertrag v
+    JOIN vertragsprodukt vp ON v.boid = vp.itsvpvertrag AND vp.replaced = TO_DATE('3000-01-01', 'yyyy-mm-dd') AND trunc(sysdate) BETWEEN vp.statefrom AND vp.stateupto
+    JOIN produkt p ON vp.itsvpprodukt = p.boid AND p.replaced = TO_DATE('3000-01-01', 'yyyy-mm-dd') AND trunc(sysdate) BETWEEN p.statefrom AND p.stateupto
+    left join vertriebspartner vpart on v.ITSVBETREUVPARTNER = vpart.boid and vpart.replaced = TO_DATE('3000-01-01', 'yyyy-mm-dd') AND trunc(sysdate) BETWEEN vpart.statefrom AND vpart.stateupto
+    LEFT JOIN vertragskriterium vkrit ON (vkrit.itsvpkriterien = vp.boid  AND vkrit.REPLACED= TO_DATE('3000-01-01', 'yyyy-mm-dd') and vkrit.itsvprodkriterium IN ( 'cf6b133b-ec12-46a8-961c-8d4f4373f415',
+                                     'aadcc07c-cf2c-4d93-ab28-76914fbbe4c3',
+                                     'aea338c9-f99c-47d0-8764-ecfb98832d36' ) )
+WHERE
+    v.EVJAHRUMSTELLGBIS BETWEEN '12.08.2023' AND '19.08.2023'
+    AND trunc(sysdate) BETWEEN v.statefrom AND v.stateupto
+    AND v.replaced = TO_DATE('3000-01-01', 'yyyy-mm-dd') AND v.gulbis = TO_DATE('3000-01-01', 'yyyy-mm-dd')
+    AND p.INTERNALNAME in ('PRD_2GEMO_PRIVAT_HAFTPFLICHT','PRD_2GEMO_PRIVAT_HAFTPFLICHT_UEBERMAKLER','PRD_2GEMO_PRIVAT_HAFTPFLICHT_19','PRD_2GEMO_HHV')
+    AND vpart.VERTRIEBPARTNR not in ('VER00004931.5','VER00009048.8','VER00000010.5','VER00001234.7')
+    AND  (vpart.ITSPARENTVTRIEBP is null or vpart.ITSPARENTVTRIEBP not in ('VER00004931.5','VER00009048.8','VER00000010.5','VER00001234.7'))
+    AND (COALESCE(vkrit.WERTDEF,0) < 5 and COALESCE(vkrit.WERTDEF,0) > -5)
+    Order by v.vertragsnr;
